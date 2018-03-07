@@ -84,6 +84,54 @@ TEST(ClientAPI, LoginWrongUsername)
         mtx_client->close();
 }
 
+TEST(ClientAPI, EmptyUserAvatar)
+{
+        auto alice = std::make_shared<Client>("localhost");
+
+        alice->login("alice", "secret", [alice](const mtx::responses::Login &res, ErrType err) {
+                ASSERT_FALSE(err);
+
+                auto const alice_id = res.user_id;
+                validate_login(alice_id.toString(), res);
+
+                alice->set_avatar_url("", [](ErrType err) { ASSERT_FALSE(err); });
+
+                alice->download_user_avatar(alice_id,
+                                            [](const mtx::responses::Profile &res, ErrType err) {
+                                                    ASSERT_FALSE(err);
+                                                    ASSERT_TRUE(res.avatar_url.size() == 0);
+                                            });
+
+        });
+
+        alice->close();
+}
+
+TEST(ClientAPI, RealUserAvatar)
+{
+        auto alice = std::make_shared<Client>("localhost");
+
+        alice->login("alice", "secret", [alice](const mtx::responses::Login &res, ErrType err) {
+                ASSERT_FALSE(err);
+
+                auto const alice_id   = res.user_id;
+                auto const avatar_url = "mxc://matrix.org/wefh34uihSDRGhw34";
+
+                validate_login(alice_id.toString(), res);
+
+                alice->set_avatar_url(avatar_url, [](ErrType err) { ASSERT_FALSE(err); });
+
+                alice->download_user_avatar(
+                  alice_id, [avatar_url](const mtx::responses::Profile &res, ErrType err) {
+                          ASSERT_FALSE(err);
+                          ASSERT_TRUE(res.avatar_url == avatar_url);
+                  });
+
+        });
+
+        alice->close();
+}
+
 TEST(ClientAPI, ChangeDisplayName)
 {
         std::shared_ptr<Client> mtx_client = std::make_shared<Client>("localhost");
@@ -97,6 +145,22 @@ TEST(ClientAPI, ChangeDisplayName)
                   // of an error
                   mtx_client->set_displayname("Arthur Dent",
                                               [](ErrType err) { ASSERT_FALSE(err); });
+          });
+
+        mtx_client->close();
+}
+
+TEST(ClientAPI, ChangeUserAvatar)
+{
+        std::shared_ptr<Client> mtx_client = std::make_shared<Client>("localhost");
+
+        mtx_client->login(
+          "alice", "secret", [mtx_client](const mtx::responses::Login &res, ErrType err) {
+                  ASSERT_FALSE(err);
+                  validate_login("@alice:localhost", res);
+
+                  mtx_client->set_avatar_url("mxc://matrix.org/wefh34uihSDRGhw34",
+                                             [](ErrType err) { ASSERT_FALSE(err); });
           });
 
         mtx_client->close();

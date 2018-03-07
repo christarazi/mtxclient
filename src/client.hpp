@@ -52,6 +52,8 @@ public:
                    std::function<void(const mtx::responses::Login &response, RequestErr err)>);
         //! Perform logout.
         void logout(std::function<void(const mtx::responses::Logout &response, RequestErr err)>);
+        //! Change avatar.
+        void set_avatar_url(const std::string &avatar_url, std::function<void(RequestErr err)>);
         //! Change displayname.
         void set_displayname(const std::string &displayname, std::function<void(RequestErr err)>);
         //! Create a room with the given options.
@@ -105,7 +107,9 @@ public:
         void stop_typing(const mtx::identifiers::Room &room_id,
                          std::function<void(RequestErr err)> cb);
         /* void download_room_avatar(); */
-        /* void download_user_avatar(); */
+        void download_user_avatar(
+          const mtx::identifiers::User &user_id,
+          std::function<void(const mtx::responses::Profile &, RequestErr)> callback);
         /* void download_media(); */
 
         /* void upload_filter(); */

@@ -256,6 +256,16 @@ Client::logout(
 }
 
 void
+Client::set_avatar_url(const std::string &avatar_url, std::function<void(RequestErr err)> callback)
+{
+        mtx::requests::AvatarUrl req;
+        req.avatar_url = avatar_url;
+
+        put<mtx::requests::AvatarUrl>(
+          "/client/r0/profile/" + user_id_.toString() + "/avatar_url", req, callback);
+}
+
+void
 Client::set_displayname(const std::string &displayname, std::function<void(RequestErr)> callback)
 {
         mtx::requests::DisplayName req;
@@ -415,4 +425,12 @@ Client::stop_typing(const mtx::identifiers::Room &room_id, std::function<void(Re
         req.typing = false;
 
         put<mtx::requests::TypingNotification>(api_path, req, callback);
+}
+
+void
+Client::download_user_avatar(
+  const mtx::identifiers::User &user_id,
+  std::function<void(const mtx::responses::Profile &, RequestErr)> callback)
+{
+        get<mtx::responses::Profile>("/client/r0/profile/" + user_id.toString(), callback);
 }
