@@ -150,22 +150,6 @@ TEST(ClientAPI, ChangeDisplayName)
         mtx_client->close();
 }
 
-TEST(ClientAPI, ChangeUserAvatar)
-{
-        std::shared_ptr<Client> mtx_client = std::make_shared<Client>("localhost");
-
-        mtx_client->login(
-          "alice", "secret", [mtx_client](const mtx::responses::Login &res, ErrType err) {
-                  ASSERT_FALSE(err);
-                  validate_login("@alice:localhost", res);
-
-                  mtx_client->set_avatar_url("mxc://matrix.org/wefh34uihSDRGhw34",
-                                             [](ErrType err) { ASSERT_FALSE(err); });
-          });
-
-        mtx_client->close();
-}
-
 TEST(ClientAPI, EmptyDisplayName)
 {
         std::shared_ptr<Client> mtx_client = std::make_shared<Client>("localhost");
