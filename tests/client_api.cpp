@@ -94,13 +94,15 @@ TEST(ClientAPI, EmptyUserAvatar)
                 auto const alice_id = res.user_id;
                 validate_login(alice_id.toString(), res);
 
-                alice->set_avatar_url("", [](ErrType err) { ASSERT_FALSE(err); });
+                alice->set_avatar_url("", [alice, alice_id](ErrType err) {
+                        ASSERT_FALSE(err);
 
-                alice->download_user_avatar(alice_id,
-                                            [](const mtx::responses::Profile &res, ErrType err) {
-                                                    ASSERT_FALSE(err);
-                                                    ASSERT_TRUE(res.avatar_url.size() == 0);
-                                            });
+                        alice->download_user_avatar(
+                          alice_id, [](const mtx::responses::Profile &res, ErrType err) {
+                                  ASSERT_FALSE(err);
+                                  ASSERT_TRUE(res.avatar_url.size() == 0);
+                          });
+                });
 
         });
 
@@ -119,13 +121,15 @@ TEST(ClientAPI, RealUserAvatar)
 
                 validate_login(alice_id.toString(), res);
 
-                alice->set_avatar_url(avatar_url, [](ErrType err) { ASSERT_FALSE(err); });
+                alice->set_avatar_url(avatar_url, [alice, alice_id, avatar_url](ErrType err) {
+                        ASSERT_FALSE(err);
 
-                alice->download_user_avatar(
-                  alice_id, [avatar_url](const mtx::responses::Profile &res, ErrType err) {
-                          ASSERT_FALSE(err);
-                          ASSERT_TRUE(res.avatar_url == avatar_url);
-                  });
+                        alice->download_user_avatar(
+                          alice_id, [avatar_url](const mtx::responses::Profile &res, ErrType err) {
+                                  ASSERT_FALSE(err);
+                                  ASSERT_TRUE(res.avatar_url == avatar_url);
+                          });
+                });
 
         });
 

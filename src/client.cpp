@@ -432,5 +432,8 @@ Client::download_user_avatar(
   const mtx::identifiers::User &user_id,
   std::function<void(const mtx::responses::Profile &, RequestErr)> callback)
 {
-        get<mtx::responses::Profile>("/client/r0/profile/" + user_id.toString(), callback);
+        get<mtx::responses::Profile>("/client/r0/profile/" + user_id.toString(),
+                                     [callback](const mtx::responses::Profile &res,
+                                                HeaderFields,
+                                                RequestErr err) { callback(res, err); });
 }
