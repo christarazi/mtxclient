@@ -97,8 +97,20 @@ TEST(ClientAPI, EmptyUserAvatar)
                 alice->set_avatar_url("", [alice, alice_id](ErrType err) {
                         ASSERT_FALSE(err);
 
-                        alice->download_user_avatar(
-                          alice_id, [](const mtx::responses::Profile &res, ErrType err) {
+                        auto done = false;
+
+                        alice->get_profile(
+                          alice_id, [&done](const mtx::responses::Profile &res, ErrType err) {
+                                  ASSERT_FALSE(err);
+                                  ASSERT_TRUE(res.avatar_url.size() == 0);
+                                  done = true;
+                          });
+
+                        while (!done)
+                                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                        alice->get_avatar_url(
+                          alice_id, [](const mtx::responses::AvatarUrl &res, ErrType err) {
                                   ASSERT_FALSE(err);
                                   ASSERT_TRUE(res.avatar_url.size() == 0);
                           });
@@ -124,8 +136,22 @@ TEST(ClientAPI, RealUserAvatar)
                 alice->set_avatar_url(avatar_url, [alice, alice_id, avatar_url](ErrType err) {
                         ASSERT_FALSE(err);
 
-                        alice->download_user_avatar(
-                          alice_id, [avatar_url](const mtx::responses::Profile &res, ErrType err) {
+                        auto done = false;
+
+                        alice->get_profile(
+                          alice_id,
+                          [avatar_url, &done](const mtx::responses::Profile &res, ErrType err) {
+                                  ASSERT_FALSE(err);
+                                  ASSERT_TRUE(res.avatar_url == avatar_url);
+                                  done = true;
+                          });
+
+                        while (!done)
+                                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                        alice->get_avatar_url(
+                          alice_id,
+                          [avatar_url](const mtx::responses::AvatarUrl &res, ErrType err) {
                                   ASSERT_FALSE(err);
                                   ASSERT_TRUE(res.avatar_url == avatar_url);
                           });

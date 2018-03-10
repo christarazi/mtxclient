@@ -276,6 +276,26 @@ Client::set_displayname(const std::string &displayname, std::function<void(Reque
 }
 
 void
+Client::get_profile(const mtx::identifiers::User &user_id,
+                    std::function<void(const mtx::responses::Profile &, RequestErr)> callback)
+{
+        get<mtx::responses::Profile>("/client/r0/profile/" + user_id.toString(),
+                                     [callback](const mtx::responses::Profile &res,
+                                                HeaderFields,
+                                                RequestErr err) { callback(res, err); });
+}
+
+void
+Client::get_avatar_url(const mtx::identifiers::User &user_id,
+                       std::function<void(const mtx::responses::AvatarUrl &, RequestErr)> callback)
+{
+        get<mtx::responses::AvatarUrl>("/client/r0/profile/" + user_id.toString() + "/avatar_url",
+                                       [callback](const mtx::responses::AvatarUrl &res,
+                                                  HeaderFields,
+                                                  RequestErr err) { callback(res, err); });
+}
+
+void
 Client::create_room(const mtx::requests::CreateRoom &room_options,
                     std::function<void(const mtx::responses::CreateRoom &, RequestErr)> callback)
 {
@@ -425,15 +445,4 @@ Client::stop_typing(const mtx::identifiers::Room &room_id, std::function<void(Re
         req.typing = false;
 
         put<mtx::requests::TypingNotification>(api_path, req, callback);
-}
-
-void
-Client::download_user_avatar(
-  const mtx::identifiers::User &user_id,
-  std::function<void(const mtx::responses::Profile &, RequestErr)> callback)
-{
-        get<mtx::responses::Profile>("/client/r0/profile/" + user_id.toString(),
-                                     [callback](const mtx::responses::Profile &res,
-                                                HeaderFields,
-                                                RequestErr err) { callback(res, err); });
 }

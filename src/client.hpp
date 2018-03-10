@@ -56,6 +56,13 @@ public:
         void set_avatar_url(const std::string &avatar_url, std::function<void(RequestErr err)>);
         //! Change displayname.
         void set_displayname(const std::string &displayname, std::function<void(RequestErr err)>);
+        //! Get user profile.
+        void get_profile(const mtx::identifiers::User &user_id,
+                         std::function<void(const mtx::responses::Profile &, RequestErr)> callback);
+        //! Get user avatar URL.
+        void get_avatar_url(
+          const mtx::identifiers::User &user_id,
+          std::function<void(const mtx::responses::AvatarUrl &, RequestErr)> callback);
         //! Create a room with the given options.
         void create_room(
           const mtx::requests::CreateRoom &room_options,
@@ -107,9 +114,6 @@ public:
         void stop_typing(const mtx::identifiers::Room &room_id,
                          std::function<void(RequestErr err)> cb);
         /* void download_room_avatar(); */
-        void download_user_avatar(
-          const mtx::identifiers::User &user_id,
-          std::function<void(const mtx::responses::Profile &, RequestErr)> callback);
         /* void download_media(); */
 
         /* void upload_filter(); */
